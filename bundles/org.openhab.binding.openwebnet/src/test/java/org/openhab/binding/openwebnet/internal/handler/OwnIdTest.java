@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Massimo Valla - Initial contribution, updates
  * @author Andrea Conte - Energy management
  * @author Giovanni Fabiani - Auxiliary message support
+ * @author Giorgio Iacoboni - Thermo central units support
  */
 @NonNullByDefault
 public class OwnIdTest {
@@ -85,6 +86,8 @@ public class OwnIdTest {
         bus_autom("*2*0*93##",Who.fromValue(2),  new WhereLightAutom("93"), "93", "2.93", "93"),
         bus_thermo_via_cu("*#4*#1*0*0020##",  Who.fromValue(4), new WhereThermo("#1"), "1", "4.1", "1"),
         bus_thermo("*#4*1*0*0020##", Who.fromValue(4),  new WhereThermo("1"),  "1", "4.1", "1"),
+        bus_thermo_4zone_cu("*4*110#0200*#0#1##", Who.fromValue(4),  new WhereThermo("#0#1"),  "0h1", "4.0h1", "0h1"),
+        bus_thermo_99zone_cu("*4*110#0200*#0##", Who.fromValue(4),  new WhereThermo("#0"),  "0", "4.0", "0"),
         bus_thermo_act("*#4*1#2*20*0##",   Who.fromValue(4), new WhereThermo("1#2") ,"1", "4.1", "1"),
         bus_tempSensor("*#4*500*15*1*0020*0001##",Who.fromValue(4),  new WhereThermo("500"), "500", "4.500", "500"),
         bus_energy("*#18*51*113##",   Who.fromValue(18), new WhereEnergyManagement("51"),  "51", "18.51", "51"),
