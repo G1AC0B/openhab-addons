@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
  * @author Massimo Valla - Initial contribution
  * @author Andrea Conte - Thermoregulation
  * @author Gilberto Cocchi - Thermoregulation
+ * @author Giorgio Iacoboni - Thermoregulation
  */
 @NonNullByDefault
 public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
@@ -74,7 +75,9 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = OpenWebNetBindingConstants.THERMOREGULATION_SUPPORTED_THING_TYPES;
 
-    private double currentSetPointTemp = 11.5d; // 11.5 is the default setTemp used in MyHomeUP mobile app
+    private static final double DEFAULT_SET_POINT_TEMP = 11.5d; // 11.5 is the default setTemp used in MyHomeUP
+
+    private double currentSetPointTemp = DEFAULT_SET_POINT_TEMP;
 
     private Thermoregulation.Function currentFunction = Thermoregulation.Function.GENERIC;
     private Thermoregulation.OperationMode currentMode = Thermoregulation.OperationMode.MANUAL;
@@ -237,8 +240,13 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
                     newTemp = ((DecimalType) command).doubleValue();
                 }
                 try {
-                    send(Thermoregulation.requestWriteSetpointTemperature(getWhere(w.value()), newTemp,
-                            currentFunction));
+                    if (currentMode != Thermoregulation.OperationMode.OFF) {
+                        send(Thermoregulation.requestWriteSetpointTemperature(getWhere(w.value()), newTemp,
+                                currentFunction));
+                    } else {
+                        logger.debug("ignoring handleSetpoint() {}. currentMode {} currentFunction {}", command,
+                                currentMode, currentFunction);
+                    }
                 } catch (MalformedFrameException | OWNException e) {
                     logger.warn("handleSetpoint() {}", e.getMessage());
                 }
