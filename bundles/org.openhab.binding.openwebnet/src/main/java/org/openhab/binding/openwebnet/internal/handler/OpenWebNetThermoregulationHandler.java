@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
  * @author Massimo Valla - Initial contribution
  * @author Andrea Conte - Thermoregulation
  * @author Gilberto Cocchi - Thermoregulation
+ * @author Giorgio Iacoboni - Thermoregulation
  */
 @NonNullByDefault
 public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
@@ -74,7 +75,9 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = OpenWebNetBindingConstants.THERMOREGULATION_SUPPORTED_THING_TYPES;
 
-    private double currentSetPointTemp = 11.5d; // 11.5 is the default setTemp used in MyHomeUP mobile app
+    private static final double DEFAULT_SET_POINT_TEMP = 11.5d; // 11.5 is the default setTemp used in MyHomeUP
+
+    private double currentSetPointTemp = DEFAULT_SET_POINT_TEMP;
 
     private Thermoregulation.Function currentFunction = Thermoregulation.Function.GENERIC;
     private Thermoregulation.OperationMode currentMode = Thermoregulation.OperationMode.MANUAL;
@@ -465,7 +468,7 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
 
     private void updateSetpoint(Thermoregulation tmsg) {
         try {
-            double temp = 11.5d;
+            Double temp = null;
             if (isCentralUnit) {
                 if (tmsg.getWhat() == null) {
                     // it should be like *4*WHAT#TTTT*#0##
@@ -483,8 +486,12 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
             } else {
                 temp = Thermoregulation.parseTemperature(tmsg);
             }
+            if (temp != null) {
             updateState(CHANNEL_TEMP_SETPOINT, getAsQuantityTypeOrNull(temp, SIUnits.CELSIUS));
             currentSetPointTemp = temp;
+            } else {
+                logger.debug("updateSetpoint() no setpoint temperature on frame {}", tmsg);
+            }
         } catch (NumberFormatException e) {
             logger.warn("updateSetpoint() NumberFormatException on frame {}: {}", tmsg, e.getMessage());
             updateState(CHANNEL_TEMP_SETPOINT, UnDefType.UNDEF);
