@@ -259,7 +259,11 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
                 newTemp = ((DecimalType) command).doubleValue();
             }
             try {
-                send(Thermoregulation.requestWriteSetpointTemperature(getWhere(), newTemp, currentFunction));
+                if (currentMode != Thermoregulation.OperationMode.OFF) {
+                        send(Thermoregulation.requestWriteSetpointTemperature(getWhere(), newTemp, currentFunction));} else {
+                        logger.debug("ignoring handleSetpoint() {}. currentMode {} currentFunction {}", command,
+                                currentMode, currentFunction);
+                    }
             } catch (MalformedFrameException | OWNException e) {
                 logger.warn("handleSetpoint() {}", e.getMessage());
             }
