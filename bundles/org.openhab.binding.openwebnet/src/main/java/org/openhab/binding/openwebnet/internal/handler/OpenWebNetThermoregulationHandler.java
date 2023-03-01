@@ -483,7 +483,7 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
 
     private void updateSetpoint(Thermoregulation tmsg) {
         try {
-            double temp = 11.5d;
+            Double temp = null;
             if (isCentralUnit) {
                 if (tmsg.getWhat() == null) {
                     // it should be like *4*WHAT#TTTT*#0##
@@ -501,8 +501,12 @@ public class OpenWebNetThermoregulationHandler extends OpenWebNetThingHandler {
             } else {
                 temp = Thermoregulation.parseTemperature(tmsg);
             }
+            if (temp != null) {
             updateState(CHANNEL_TEMP_SETPOINT, getAsQuantityTypeOrNull(temp, SIUnits.CELSIUS));
             currentSetPointTemp = temp;
+            } else {
+                logger.debug("updateSetpoint() no setpoint temperature on frame {}", tmsg);
+            }
         } catch (NumberFormatException e) {
             logger.warn("updateSetpoint() NumberFormatException on frame {}: {}", tmsg, e.getMessage());
             updateState(CHANNEL_TEMP_SETPOINT, UnDefType.UNDEF);
